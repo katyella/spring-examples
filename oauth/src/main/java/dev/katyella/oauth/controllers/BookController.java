@@ -1,7 +1,7 @@
-package dev.katyella.oauth.controller;
+package dev.katyella.oauth.controllers;
 
-import dev.katyella.oauth.model.Book;
-import dev.katyella.oauth.repository.BookRepository;
+import dev.katyella.oauth.models.Book;
+import dev.katyella.oauth.repositories.BookRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;

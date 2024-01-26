@@ -1,6 +1,6 @@
-package dev.katyella.oauth.repository;
+package dev.katyella.oauth.repositories;
 
-import dev.katyella.oauth.model.Book;
+import dev.katyella.oauth.models.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

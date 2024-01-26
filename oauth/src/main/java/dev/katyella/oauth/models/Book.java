@@ -1,4 +1,4 @@
-package dev.katyella.oauth.model;
+package dev.katyella.oauth.models;
 
 import jakarta.persistence.*;
 

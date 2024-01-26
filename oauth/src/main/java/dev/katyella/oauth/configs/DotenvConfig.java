@@ -1,4 +1,4 @@
-package dev.katyella.oauth.config;
+package dev.katyella.oauth.configs;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Bean;
