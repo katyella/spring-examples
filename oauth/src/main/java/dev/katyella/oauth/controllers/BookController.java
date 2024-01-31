@@ -3,6 +3,7 @@ package dev.katyella.oauth.controllers;
 import dev.katyella.oauth.models.Book;
 import dev.katyella.oauth.repositories.BookRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class BookController {
     @Autowired
     private BookRepository bookRepository;
