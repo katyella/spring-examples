@@ -37,6 +37,29 @@ public class SeedDataConfig implements CommandLineRunner {
 
             userService.save(admin);
             log.debug("created ADMIN user - {}", admin);
+
+            User user1 = User.builder()
+                    .firstName("John")
+                    .lastName("Doe")
+                    .email("john.doe@example.com")
+                    .password(passwordEncoder.encode("password1"))
+                    .role(Role.ROLE_USER)
+                    .build();
+
+            userService.save(user1);
+            log.debug("created USER user - {}", user1);
+
+            User user2 = User.builder()
+                    .firstName("Jane")
+                    .lastName("Smith")
+                    .email("jane.smith@example.com")
+                    .password(passwordEncoder.encode("password2"))
+                    .role(Role.ROLE_USER)
+                    .build();
+
+            userService.save(user2);
+            log.debug("created USER user - {}", user2);
+
         }
     }
 
