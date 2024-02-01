@@ -1,56 +1,46 @@
 package dev.katyella.oauth.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 @Entity
 @Table(name = "books")
 public class Book {
 
-    private long id;
-    private String authorFirstName;
-    private String authorLastName;
-    private String title;
-
-    public Book() {
-
-    }
-
-    public Book(String authorFirstName, String authorLastName, String title) {
-        this.authorFirstName = authorFirstName;
-        this.authorLastName = authorLastName;
-        this.title = title;
-    }
-
+    // Getter and Setter methods
+    // Make sure to have getters and setters for all fields
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
+    private long id;
 
+    @Setter
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Setter
     @Column(name = "author_first_name", nullable = false)
-    public String getAuthorFirstName() {
-        return authorFirstName;
-    }
-    public void setAuthorFirstName(String authorFirstName) {
-        this.authorFirstName = authorFirstName;
-    }
+    private String authorFirstName;
 
+    @Setter
     @Column(name = "author_last_name", nullable = false)
-    public String getAuthorLastName() {
-        return authorLastName;
-    }
-    public void setAuthorLastName(String authorLastName) {
-        this.authorLastName = authorLastName;
+    private String authorLastName;
+
+    @Setter
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    // Default constructor
+    public Book() {
     }
 
-    @Column(name = "title", nullable = false)
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
+    // Constructor with parameters
+    public Book(String createdBy, String authorFirstName, String authorLastName, String title) {
+        this.createdBy = createdBy;
+        this.authorFirstName = authorFirstName;
+        this.authorLastName = authorLastName;
         this.title = title;
     }
+
 }

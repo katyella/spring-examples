@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,43 +25,87 @@ public class BookController {
     private BookRepository bookRepository;
 
     @GetMapping("/books")
-    public List <Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<Book> getAllBooks() {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // If user is admin, return all books
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return bookRepository.findAll();
+        } else {
+            // Otherwise, return books created by the user
+            return bookRepository.findByCreatedBy(username);
+        }
     }
 
     @GetMapping("/books/{id}")
-    public ResponseEntity <Book> getBookById(@PathVariable(value = "id") Long bookId)
-        throws ConfigDataResourceNotFoundException {
+    public ResponseEntity<Book> getBookById(@PathVariable(value = "id") Long bookId) throws ConfigDataResourceNotFoundException {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found for this id :: " + bookId));
-        return ResponseEntity.ok().body(book);
+
+        // Check if the book belongs to the authenticated user or if the user is admin
+        if (book.getCreatedBy().equals(username) || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return ResponseEntity.ok().body(book);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
+        }
     }
 
     @PostMapping("/books")
     public Book createBook(@Valid @RequestBody Book book) {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Set the creator of the book
+        book.setCreatedBy(username);
+
         return bookRepository.save(book);
     }
 
     @PutMapping("/books/{id}")
-    public ResponseEntity <Book> updateBook(@PathVariable(value = "id") Long bookId, @Valid @RequestBody Book bookDetails) throws ConfigDataResourceNotFoundException {
+    public ResponseEntity<Book> updateBook(@PathVariable(value = "id") Long bookId, @Valid @RequestBody Book bookDetails) throws ConfigDataResourceNotFoundException {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found for this id :: " + bookId));
 
-        book.setAuthorFirstName(bookDetails.getAuthorFirstName());
-        book.setAuthorLastName(bookDetails.getAuthorLastName());
-        book.setTitle(book.getTitle());
-        final Book updatedBook = bookRepository.save(book);
-        return ResponseEntity.ok(updatedBook);
+        // Check if the book belongs to the authenticated user or if the user is admin
+        if (book.getCreatedBy().equals(username) || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            book.setAuthorFirstName(bookDetails.getAuthorFirstName());
+            book.setAuthorLastName(bookDetails.getAuthorLastName());
+            book.setTitle(bookDetails.getTitle());
+            final Book updatedBook = bookRepository.save(book);
+            return ResponseEntity.ok(updatedBook);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
+        }
     }
 
     @DeleteMapping("/books/{id}")
-    public Map <String, Boolean > deleteBook(@PathVariable(value = "id") Long bookId) throws ConfigDataResourceNotFoundException {
+    public Map<String, Boolean> deleteBook(@PathVariable(value = "id") Long bookId) throws ConfigDataResourceNotFoundException {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found for this id :: " + bookId));
 
-        bookRepository.delete(book);
-        Map <String, Boolean> response = new HashMap <> ();
-        response.put("deleted", Boolean.TRUE);
-        return response;
+        // Check if the book belongs to the authenticated user or if the user is admin
+        if (book.getCreatedBy().equals(username) || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            bookRepository.delete(book);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("deleted", Boolean.TRUE);
+            return response;
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
+        }
     }
 }
